@@ -11,14 +11,22 @@ const ItemSchema = new mongoose.Schema({
         required: true
     },
     note: {
-        type: String        
+        type: String,
+        default: '',
     },
     image: {
-        type: String        
+        type: String,
+        default: '',
     },
     category: {
-        type: String        
-    }
+        type: mongoose.Schema.ObjectId,
+        ref: 'Category',
+        required: true
+    },
+     createdAt: {
+        type: Date,
+        default: Date.now
+    },
 
 })
 
