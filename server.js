@@ -17,7 +17,7 @@ connectDB()
 //route files
 const auth = require('./routes/auth')
 const items = require('./routes/items')
-const categories = require('./routes/categories')
+const shoppingList = require('./routes/shoppingList')
 
 
 const app = express()
@@ -40,7 +40,7 @@ if (process.env.NODE_ENV == 'development') {
 //mount routes
 app.use('/api/v1/auth', auth)
 app.use('/api/v1/items', items)
-app.use('/api/v1/categories', categories)
+app.use('/api/v1/list', shoppingList)
 
 
 app.use(errorHandler)

@@ -55,6 +55,19 @@ exports.login = asyncHandler(async (req, res, next) => {
 })
 
 
+// @desc        Get current logged in user
+// @route       GET /api/v1/auth/me
+// @access      Private
+exports.me = asyncHandler(async (req, res, next) => {
+
+    const user = await User.findById(req.user._id)
+
+    res.status(200).json({
+        success: true,
+        data: user
+    })
+})
+
 
 
 //get token from model, create token and send response

@@ -32,10 +32,6 @@ exports.createItem = asyncHandler(async (req, res, next) => {
 exports.getItems = asyncHandler(async (req, res, next) => {    
     
     var items = await Item.find({ user: req.user._id })
-    .populate({
-        path: 'category',
-        select: ['name', '_id']
-    })
 
     res.status(200).json({
         success: true,
@@ -82,7 +78,7 @@ exports.deleteItem = asyncHandler(async (req, res, next) => {
     if (!item) {
         return next(new ErrorResponse(`Item not found with id ${req.params.id}`, 404))        
     }
-    console.log(item.user, req.user._id.toString(), req.user._id.toString() !== item.user.toString());
+    
     //make sure user is item owner
     if (item.user.toString() !== req.user._id.toString()) {
         return next(new ErrorResponse(`User ${req.user._id} is not authorized to delete this recipe`, 401))                

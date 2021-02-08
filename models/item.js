@@ -19,9 +19,8 @@ const ItemSchema = new mongoose.Schema({
         default: '',
     },
     category: {
-        type: mongoose.Schema.ObjectId,
-        ref: 'Category',
-        required: true
+       type: String,
+       required: [true, 'Please add category']
     },
      createdAt: {
         type: Date,
