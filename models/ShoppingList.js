@@ -3,7 +3,8 @@ const mongoose = require('mongoose')
 const ShoppingListSchema = new mongoose.Schema({
     name: {
         type: String,
-        required: [true, 'Please add item name']
+        default: "",
+        required: false
     },
     user: {
         type: mongoose.Schema.ObjectId,
@@ -20,6 +21,10 @@ const ShoppingListSchema = new mongoose.Schema({
             type: Number,
             required: true,
             default: 1
+        },
+        done: {
+            type: Boolean,
+            default: false
         }
     }],
 

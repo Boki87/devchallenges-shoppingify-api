@@ -10,7 +10,7 @@ exports.createShoppingList = asyncHandler(async (req, res, next) => {
     const { name, items, status } = req.body
     
 
-    if (!name || !status) {
+    if (!status) {
         return next(new ErrorResponse(`Please add name and status`, 400))
     }
 
@@ -40,6 +40,26 @@ exports.getShoppingLists = asyncHandler(async (req, res, next) => {
 
 })
 
+// @desc        Get Active Shopping List
+// @route       GET /api/v1/list/active
+// @access      Private
+exports.getActiveShoppingList = asyncHandler(async (req, res, next) => {
+
+    let activeShoppingList = await ShoppingList.findOne({user: req.user._id, status: 'active'}).populate({
+        path: 'items',
+        populate: {
+            path: 'item',
+            select: 'name note image category user done quantity'
+        }
+    })
+    
+    res.status(200).json({
+        success: true,
+        data: activeShoppingList
+    })
+
+})
+
 // @desc        Get Shopping Lists
 // @route       GET /api/v1/list
 // @access      Private
@@ -65,7 +85,7 @@ exports.getShoppingList = asyncHandler(async (req, res, next) => {
         path: 'items',
         populate: {
             path: 'item',
-            select: 'name'
+            select: 'name note image category user done quantity'
         }
     })
 
