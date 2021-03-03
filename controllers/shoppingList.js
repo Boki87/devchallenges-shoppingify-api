@@ -160,22 +160,48 @@ exports.getStatistics = asyncHandler(async (req, res, next) => {
         path: 'items',
         populate: {
             path: 'item',
-            select: 'name quantity category'
+            select: 'name quantity category createdAt'
         }
     })
 
 
     //get top 3 items in percentage
-    let itemsPercentage = {}
-    let categoryPercentage = {}
+    const itemsPercentage = {}
+    const categoryPercentage = {}
 
-    var itemsTotal = 0        
-    var categoryTotal = 0        
+    var itemsTotal = 0                
+    const monthStats = {}
+
+    const months = [
+                'January',
+                'February',
+                'March',
+                'April',
+                'May',
+                'June',
+                'July',
+                'August',
+                'September',
+                'October',
+                'December'
+    ]
+    
     shoppingLists.forEach(sl => {
 
         sl.items.forEach(item => {
             
-            itemsTotal += item.quantity            
+            let d = new Date(item.item.createdAt)
+            let year = d.getFullYear()
+            let month = d.getMonth()
+
+            if (!monthStats.hasOwnProperty(`${year}-${month}`)) {                
+                monthStats[`${year}-${month}`] = item.quantity
+            } else {
+                monthStats[`${year}-${month}`] += item.quantity
+            }
+
+
+            itemsTotal += item.quantity
 
             if (!itemsPercentage.hasOwnProperty(item.item.name)) {
                 itemsPercentage[item.item.name] = item.quantity                                
@@ -183,8 +209,7 @@ exports.getStatistics = asyncHandler(async (req, res, next) => {
                 itemsPercentage[item.item.name] += item.quantity                                
             }
 
-            if (!categoryPercentage.hasOwnProperty(item.item.category)) {
-                console.log(item);
+            if (!categoryPercentage.hasOwnProperty(item.item.category)) {                
                 categoryPercentage[item.item.category] = item.quantity
             } else {
                 categoryPercentage[item.item.category] += item.quantity
@@ -215,6 +240,20 @@ exports.getStatistics = asyncHandler(async (req, res, next) => {
     }, {});
     
 
+    const monthStatsFull = []    
+    Object.keys(monthStats).forEach(prop => {
+
+        let month = months[+prop.split('-')[1]]
+        let year = prop.split('-')[0]
+        monthStatsFull.push({
+            id: prop,
+            name: `${month}`,
+            items: monthStats[prop]
+        })
+    })
+
+    console.log(monthStatsFull);
+
     /////////
 
 
@@ -222,7 +261,8 @@ exports.getStatistics = asyncHandler(async (req, res, next) => {
         success: true,
         data: {
             itemsPercentage: topThreeItems,
-            categoryPercentage: topThreeCategory
+            categoryPercentage: topThreeCategory,
+            monthStats: monthStatsFull
         }
     })
 })
