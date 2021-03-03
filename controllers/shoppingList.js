@@ -149,3 +149,80 @@ exports.updateShoppingList = asyncHandler(async (req, res, next) => {
     })
 
 })
+
+// @desc        Shopping List Statistics
+// @route       GET /api/v1/list/stats
+// @access      Private
+exports.getStatistics = asyncHandler(async (req, res, next) => { 
+
+    let shoppingLists = await ShoppingList.find({ user: req.user._id })
+    .populate({
+        path: 'items',
+        populate: {
+            path: 'item',
+            select: 'name quantity category'
+        }
+    })
+
+
+    //get top 3 items in percentage
+    let itemsPercentage = {}
+    let categoryPercentage = {}
+
+    var itemsTotal = 0        
+    var categoryTotal = 0        
+    shoppingLists.forEach(sl => {
+
+        sl.items.forEach(item => {
+            
+            itemsTotal += item.quantity            
+
+            if (!itemsPercentage.hasOwnProperty(item.item.name)) {
+                itemsPercentage[item.item.name] = item.quantity                                
+            } else {
+                itemsPercentage[item.item.name] += item.quantity                                
+            }
+
+            if (!categoryPercentage.hasOwnProperty(item.item.category)) {
+                console.log(item);
+                categoryPercentage[item.item.category] = item.quantity
+            } else {
+                categoryPercentage[item.item.category] += item.quantity
+            }
+            
+        })        
+    })
+    
+    var itemsProps = Object.keys(itemsPercentage).map(function(key) {
+        return { key: key, value: this[key] };
+    }, itemsPercentage);
+    itemsProps.sort(function(p1, p2) { return p2.value - p1.value; });
+    var topThreeItems = itemsProps.slice(0, 3).reduce(function (obj, prop) {
+        let percentage = Math.floor(prop.value * (100 / itemsTotal)) 
+        obj[prop.key] = percentage;
+        return obj;
+    }, {});
+
+
+    var categoryProps = Object.keys(categoryPercentage).map(function(key) {
+        return { key: key, value: this[key] };
+    }, categoryPercentage);
+    categoryProps.sort(function(p1, p2) { return p2.value - p1.value; });
+    var topThreeCategory = categoryProps.slice(0, 3).reduce(function (obj, prop) {
+        let percentage = Math.floor(prop.value * (100 / itemsTotal)) 
+        obj[prop.key] = percentage;
+        return obj;
+    }, {});
+    
+
+    /////////
+
+
+    res.status(200).json({
+        success: true,
+        data: {
+            itemsPercentage: topThreeItems,
+            categoryPercentage: topThreeCategory
+        }
+    })
+})
