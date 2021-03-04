@@ -250,9 +250,7 @@ exports.getStatistics = asyncHandler(async (req, res, next) => {
             name: `${month}`,
             items: monthStats[prop]
         })
-    })
-
-    console.log(monthStatsFull);
+    })    
 
     /////////
 
