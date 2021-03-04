@@ -218,26 +218,20 @@ exports.getStatistics = asyncHandler(async (req, res, next) => {
         })        
     })
     
-    var itemsProps = Object.keys(itemsPercentage).map(function(key) {
-        return { key: key, value: this[key] };
+    var itemsProps = Object.keys(itemsPercentage).map(function (key) {
+        let percentage = Math.floor(this[key] * (100 / itemsTotal)) 
+        return { name: key, value: percentage };
     }, itemsPercentage);
     itemsProps.sort(function(p1, p2) { return p2.value - p1.value; });
-    var topThreeItems = itemsProps.slice(0, 3).reduce(function (obj, prop) {
-        let percentage = Math.floor(prop.value * (100 / itemsTotal)) 
-        obj[prop.key] = percentage;
-        return obj;
-    }, {});
+    var topThreeItems = itemsProps.slice(0, 3)    
 
 
-    var categoryProps = Object.keys(categoryPercentage).map(function(key) {
-        return { key: key, value: this[key] };
+    var categoryProps = Object.keys(categoryPercentage).map(function (key) {
+        let percentage = Math.floor(this[key] * (100 / itemsTotal)) 
+        return { name: key, value: percentage };
     }, categoryPercentage);
     categoryProps.sort(function(p1, p2) { return p2.value - p1.value; });
-    var topThreeCategory = categoryProps.slice(0, 3).reduce(function (obj, prop) {
-        let percentage = Math.floor(prop.value * (100 / itemsTotal)) 
-        obj[prop.key] = percentage;
-        return obj;
-    }, {});
+    var topThreeCategory = categoryProps.slice(0, 3)
     
 
     const monthStatsFull = []    
